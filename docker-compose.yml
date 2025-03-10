@@ -1,0 +1,65 @@
+
+services:
+  nginx:
+    build:
+      context: ./nginx
+    # этот проброс нужен для обработки не php файлов! Без перпедачи в php-fpm
+    # php файлы будет обрабатывать php-fpm
+    # nginx по умолчанию не знает, что внутри папки /www есть подпапка /js, содержащая файлы JavaScript.
+    volumes:
+      - ./www:/www/public
+    container_name: nginx_d3
+    restart: always
+    ports:
+      - "84:81"
+    networks:
+      debug3: {}
+
+  php-fpm:
+    build:
+      # docker файл бует находиться в php-fpm
+      context: ./php-fpm
+    restart: always
+    container_name: php-fpm_d3
+    # чтобы контейнер не запустился раньше, чем другой
+    depends_on:
+      - mysql
+    networks:
+      - debug3
+    volumes:
+      - ./www:/www/public
+    # добавляем следующую строку в файл /etc/hosts:
+    # обращения к хост-машине host.docker.internal
+    # host-gateway: Это псевдоним, который Docker автоматически резолвит в IP-адрес хоста.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    # задаем переменную окружения PHP_IDE_CONFIG
+    environment:
+      PHP_IDE_CONFIG: serverName=DockerDebug3
+
+
+  mysql:
+    image: mysql:8.0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mysql_d3 # Указываем имя сервиса
+        # по умолчанию, начиная с MySQL 8.0, MySQL использует более безопасный механизм аутентификации, caching_sha2_password.
+    command: --default_authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      #- MYSQL_DATABASE=mess     # создает пустую БД до выполнения скрипта
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=admin
+    ports:
+      - "3337:3306"
+    volumes:
+      - ./mysql_data:/var/lib/mysql  # Добавляем эту строку для сохранения данных
+    networks:
+      - debug3
+
+networks:
+  debug3:
+    # драйвер bridge создает изолированную сеть для контейнеров
+    driver: bridge
