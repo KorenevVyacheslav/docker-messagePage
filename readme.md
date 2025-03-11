@@ -51,7 +51,7 @@
 
 `docker exec -it php-fpm_d3 /bin/bash`
 
-в контейнере выполнить команду "compoer update":
+в контейнере выполнить команду "composer update":
 
 
 `cd /www/public`
