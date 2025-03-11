@@ -40,14 +40,25 @@
 ## Как открыть/запустить
 
 Клонировать https://github.com/KorenevVyacheslav/docker-messagePage в папку c вашими доменами. 
-Перейти в папку docker-messagePage. Выполнить команду для composer update:
-
-`docker exec -it php-fpm_d3 /bin/bash`
-`composer update`
+Перейти в папку docker-messagePage. 
 
 Выполнить команду:
 
-  `docker compose up -d --build`
+`docker compose up -d --build`
 
-В браузере выполнить строку запроса http://localhost:84
+
+Выполнить команду для входа в контейнер:
+
+`docker exec -it php-fpm_d3 /bin/bash`
+
+в контейнере выполнить команду "compoer update":
+
+
+`cd /www/public`
+
+
+`composer update`
+
+
+В браузере выполнить строку запроса http://localhost:83
 
